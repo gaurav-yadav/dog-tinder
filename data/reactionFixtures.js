@@ -1,0 +1,73 @@
+export const reactionFixtures = {
+  'positive-01': {
+    id: 'positive-01',
+    label: 'Happy wag',
+    videoUrl: '/reactions/positive-01.mp4',
+    fallbackAnalysis: {
+      tailWagging: 0.92,
+      approaching: 0.81,
+      sustainedAttention: 0.89,
+      playfulBodyLanguage: 0.85,
+      excitement: 0.88,
+      avoidance: 0.03,
+      disengagement: 0.05,
+      stressSignals: 0.02,
+      confidence: 0.91,
+      summary: 'Sustained attention, forward movement, and a loose active posture.',
+    },
+  },
+  'positive-02': {
+    id: 'positive-02',
+    label: 'Curious & playful',
+    videoUrl: '/reactions/positive-02.mp4',
+    fallbackAnalysis: {
+      tailWagging: 0.68,
+      approaching: 0.74,
+      sustainedAttention: 0.84,
+      playfulBodyLanguage: 0.76,
+      excitement: 0.7,
+      avoidance: 0.08,
+      disengagement: 0.08,
+      stressSignals: 0.04,
+      confidence: 0.86,
+      summary: 'The dog stays visually engaged and moves forward with a relaxed posture.',
+    },
+  },
+  neutral: {
+    id: 'neutral',
+    label: 'Neutral',
+    videoUrl: '/reactions/neutral.mp4',
+    fallbackAnalysis: {
+      tailWagging: 0.15,
+      approaching: 0.1,
+      sustainedAttention: 0.5,
+      playfulBodyLanguage: 0.15,
+      excitement: 0.2,
+      avoidance: 0.2,
+      disengagement: 0.35,
+      stressSignals: 0.15,
+      confidence: 0.85,
+      summary: 'Some attention is visible, but there is little approach or playful activity.',
+    },
+  },
+  negative: {
+    id: 'negative',
+    label: 'Turns away',
+    videoUrl: '/reactions/negative.mp4',
+    fallbackAnalysis: {
+      tailWagging: 0.05,
+      approaching: 0.03,
+      sustainedAttention: 0.15,
+      playfulBodyLanguage: 0.04,
+      excitement: 0.1,
+      avoidance: 0.85,
+      disengagement: 0.75,
+      stressSignals: 0.7,
+      confidence: 0.9,
+      summary: 'The dog repeatedly turns away and avoids the visible stimulus.',
+    },
+  },
+};
+
+export const safeFallbackReaction = reactionFixtures.neutral.fallbackAnalysis;
+

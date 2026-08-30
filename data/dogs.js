@@ -1,0 +1,73 @@
+export const dogs = [
+  {
+    id: 'dog-01',
+    name: 'Luna',
+    videoUrl: '/dog-videos/dog-01.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1400&q=85',
+    accent: '#ff8fa5',
+  },
+  {
+    id: 'dog-02',
+    name: 'Milo',
+    videoUrl: '/dog-videos/dog-02.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1400&q=85',
+    accent: '#ffd85a',
+  },
+  {
+    id: 'dog-03',
+    name: 'Daisy',
+    videoUrl: '/dog-videos/dog-03.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=1400&q=85',
+    accent: '#53e0a4',
+  },
+  {
+    id: 'dog-04',
+    name: 'Bruno',
+    videoUrl: '/dog-videos/dog-04.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1400&q=85',
+    accent: '#ff9e52',
+  },
+  {
+    id: 'dog-05',
+    name: 'Nala',
+    videoUrl: '/dog-videos/dog-05.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1400&q=85',
+    accent: '#bba0ff',
+  },
+  {
+    id: 'dog-06',
+    name: 'Archie',
+    videoUrl: '/dog-videos/dog-06.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=1400&q=85',
+    accent: '#60c9ff',
+  },
+  {
+    id: 'dog-07',
+    name: 'Coco',
+    videoUrl: '/dog-videos/dog-07.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=1400&q=85',
+    accent: '#ff78c8',
+  },
+  {
+    id: 'dog-08',
+    name: 'Teddy',
+    videoUrl: '/dog-videos/dog-08.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1400&q=85',
+    accent: '#f2bb80',
+  },
+  {
+    id: 'dog-09',
+    name: 'Pepper',
+    videoUrl: '/dog-videos/dog-09.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?auto=format&fit=crop&w=1400&q=85',
+    accent: '#9ed889',
+  },
+  {
+    id: 'dog-10',
+    name: 'Scout',
+    videoUrl: '/dog-videos/dog-10.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1525253013412-55c1a69a5738?auto=format&fit=crop&w=1400&q=85',
+    accent: '#ff6b6b',
+  },
+];
+
