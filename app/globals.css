@@ -191,8 +191,8 @@ button { cursor: pointer; }
 .signal-sticker > span { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; color: var(--ink); background: var(--yellow); }
 .signal-sticker > span svg { width: 25px; height: 25px; }
 .signal-sticker strong, .signal-sticker small { display: block; }
-.signal-sticker strong { color: var(--cream); font-size: 14px; line-height: 1.1; letter-spacing: .025em; }
-.signal-sticker small { margin-top: 7px; color: rgba(255,246,232,.57); font-size: 11px; line-height: 1.25; }
+.signal-sticker strong { color: var(--cream); font-size: 15px; line-height: 1.1; letter-spacing: .025em; }
+.signal-sticker small { margin-top: 7px; color: rgba(255,246,232,.7); font-size: 13px; font-weight: 620; line-height: 1.3; }
 .signal-sticker.sticker-loud { background: linear-gradient(135deg, rgba(83,224,164,.13), rgba(255,255,255,.045)); border-color: rgba(83,224,164,.24); }
 .signal-sticker.sticker-loud > span { background: var(--mint); box-shadow: 0 0 0 5px rgba(83,224,164,.08); }
 .signal-sticker.sticker-quiet { opacity: .65; border-style: dashed; }
@@ -320,6 +320,7 @@ button { cursor: pointer; }
   .control-panel { max-width: 520px; }
   .chemistry-panel { gap: 20px; }
   .signal-sticker { min-height: 98px; }
+  .signal-sticker small { font-size: 14px; }
   .control-match .action-area { margin-top: 26px; }
 }
 
@@ -333,8 +334,8 @@ button { cursor: pointer; }
   .chemistry-panel { gap: 12px; }
   .signal-sticker { min-height: 78px; grid-template-columns: 46px 1fr; gap: 10px; padding: 11px; }
   .signal-sticker > span { width: 46px; height: 46px; }
-  .signal-sticker strong { font-size: 12px; }
-  .signal-sticker small { margin-top: 5px; font-size: 9px; }
+  .signal-sticker strong { font-size: 13px; }
+  .signal-sticker small { margin-top: 5px; font-size: 11px; }
   .control-match .action-area { margin-top: 15px; }
 }
 
