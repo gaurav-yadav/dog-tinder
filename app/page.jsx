@@ -219,7 +219,7 @@ export default function Home() {
       analysisAbortRef.current = null;
       if (!response.ok) throw new Error('The reaction service did not respond.');
       payload = await response.json();
-      if (!payload?.reaction || !['MATCH', 'PASS'].includes(payload.result)) {
+      if (!payload?.reaction || !['MATCH', 'PASS', 'RETRY'].includes(payload.result)) {
         throw new Error('The reaction service returned an invalid result.');
       }
     } catch (requestError) {
@@ -390,6 +390,14 @@ export default function Home() {
     else startFixtureRecording();
   }, [clearReactionPreview, inputMode, phase, startFixtureRecording, startWebcamRecording]);
 
+  const retryReaction = useCallback(() => {
+    clearReactionPreview();
+    setAnalysis(null);
+    setError('');
+    setPhase('BROWSING');
+    setTimeout(() => mainActionRef.current?.focus(), 50);
+  }, [clearReactionPreview]);
+
   const finishEarly = useCallback(() => {
     if (inputMode === 'webcam') stopRecording(false);
     else {
@@ -406,7 +414,7 @@ export default function Home() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [phase, stopRecording]);
 
-  const result = phase === 'MATCH' || phase === 'PASS' ? phase : null;
+  const result = ['MATCH', 'PASS', 'RETRY'].includes(phase) ? phase : null;
   const busy = phase !== 'BROWSING';
 
   return (
@@ -516,18 +524,30 @@ export default function Home() {
             </div>
           )}
 
-          {(phase === 'MATCH' || phase === 'PASS') && analysis && (
+          {['MATCH', 'PASS', 'RETRY'].includes(phase) && analysis && (
             <div className="active-state result-state">
               <div className="eyebrow">
-                {phase === 'MATCH' ? <Heart size={15} fill="currentColor" /> : <ShieldCheck size={15} />}
-                Decision explained
+                {phase === 'MATCH' ? <Heart size={15} fill="currentColor" /> : phase === 'RETRY' ? <Camera size={15} /> : <ShieldCheck size={15} />}
+                {phase === 'RETRY' ? 'Capture check' : 'Decision explained'}
               </div>
-              <div className={`panel-verdict ${phase === 'MATCH' ? 'positive' : 'negative'}`}>
-                <span>{phase === 'MATCH' ? 'MATCH' : 'PASS'}</span>
-                <b>{analysis.score > 0 ? '+' : ''}{analysis.score.toFixed(2)}</b>
+              <div className={`panel-verdict ${phase === 'MATCH' ? 'positive' : phase === 'RETRY' ? 'retry' : 'negative'}`}>
+                <span>{phase === 'MATCH' ? 'MATCH' : phase === 'RETRY' ? 'NO DOG' : 'PASS'}</span>
+                <b>{phase === 'RETRY' ? 'NOT SCORED' : `${analysis.score > 0 ? '+' : ''}${analysis.score.toFixed(2)}`}</b>
               </div>
-              <SignalBars reaction={analysis.reaction} compact />
-              <p className="reaction-summary">“{analysis.reaction.summary}”</p>
+              {phase === 'RETRY' ? (
+                <div className="capture-warning">
+                  <Camera size={22} />
+                  <div>
+                    <strong>No usable reaction was captured.</strong>
+                    <p>{analysis.reaction.summary}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <SignalBars reaction={analysis.reaction} compact />
+                  <p className="reaction-summary">“{analysis.reaction.summary}”</p>
+                </>
+              )}
               {demoOpen && <small className="analysis-source">Source: {analysis.source}</small>}
             </div>
           )}
@@ -565,6 +585,11 @@ export default function Home() {
             {(phase === 'MATCH' || phase === 'PASS') && (
               <button className="start-button incoming-button" type="button" onClick={advanceCandidate}>
                 <Sparkles size={20} /> Next dog
+              </button>
+            )}
+            {phase === 'RETRY' && (
+              <button className="start-button retry-button" type="button" onClick={retryReaction}>
+                <Camera size={20} /> Record this dog again
               </button>
             )}
             <p className="privacy-note"><ShieldCheck size={11} /> Camera stays on only for one short reaction clip.</p>

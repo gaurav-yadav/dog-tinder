@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Camera, Heart, PawPrint, X } from 'lucide-react';
+import { Camera, CameraOff, Heart, PawPrint, X } from 'lucide-react';
 
 function CandidateReplay({ dog }) {
   const [failed, setFailed] = useState(false);
@@ -54,24 +54,25 @@ function ReactionReplay({ reactionUrl }) {
 
 export function ReactionComparison({ dog, reactionUrl, result }) {
   const match = result === 'MATCH';
+  const retry = result === 'RETRY';
 
   return (
-    <div className={`reaction-comparison ${match ? 'comparison-match' : 'comparison-pass'}`}>
+    <div className={`reaction-comparison ${match ? 'comparison-match' : retry ? 'comparison-retry' : 'comparison-pass'}`}>
       <div className="comparison-kicker">The canine verdict</div>
       <div className="comparison-pair">
         <CandidateReplay dog={dog} />
         <div className="comparison-verdict" aria-hidden="true">
           <span className="verdict-orbit" />
           <div className="verdict-icon">
-            {match ? <Heart fill="currentColor" /> : <X />}
+            {match ? <Heart fill="currentColor" /> : retry ? <CameraOff /> : <X />}
           </div>
-          <b>{match ? 'MATCH' : 'PASS'}</b>
+          <b>{match ? 'MATCH' : retry ? 'RETRY' : 'PASS'}</b>
         </div>
         <ReactionReplay reactionUrl={reactionUrl} />
       </div>
       <output className="comparison-copy" aria-live="assertive">
-        <strong>{match ? "IT'S A MATCH" : 'NOT FEELING IT'}</strong>
-        <span>{match ? 'The tail has spoken.' : 'No hard feelings. Next pup.'}</span>
+        <strong>{match ? "IT'S A MATCH" : retry ? 'NO DOG DETECTED' : 'NOT FEELING IT'}</strong>
+        <span>{match ? 'The tail has spoken.' : retry ? 'Keep your dog in frame and try again.' : 'No hard feelings. Next pup.'}</span>
       </output>
       {match && (
         <div className="match-sparks" aria-hidden="true">

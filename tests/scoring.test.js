@@ -17,6 +17,23 @@ test('low confidence gates an otherwise positive result', () => {
   assert.equal(scoreReaction(uncertain).result, 'PASS');
 });
 
+test('missing observable dog reaction requests another recording', () => {
+  const noDog = {
+    ...reactionFixtures.neutral.fallbackAnalysis,
+    tailWagging: 0,
+    approaching: 0,
+    sustainedAttention: 0,
+    playfulBodyLanguage: 0,
+    excitement: 0,
+    avoidance: 0,
+    disengagement: 0,
+    stressSignals: 0,
+    confidence: 0,
+    summary: 'No dog is visible in the reaction clip.',
+  };
+  assert.equal(scoreReaction(noDog).result, 'RETRY');
+});
+
 test('normalization clamps finite values and rejects malformed values', () => {
   const reaction = normalizeReaction({
     ...reactionFixtures.neutral.fallbackAnalysis,
@@ -27,4 +44,3 @@ test('normalization clamps finite values and rejects malformed values', () => {
   assert.equal(reaction.avoidance, 0);
   assert.throws(() => normalizeReaction({ ...reaction, excitement: 'high' }));
 });
-
