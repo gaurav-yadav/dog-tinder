@@ -16,7 +16,7 @@ import {
 import { CandidateMedia } from '@/components/CandidateMedia';
 import { DemoControls } from '@/components/DemoControls';
 import { ReactionCamera } from '@/components/ReactionCamera';
-import { ResultOverlay } from '@/components/ResultOverlay';
+import { ReactionComparison } from '@/components/ReactionComparison';
 import { SignalBars } from '@/components/SignalBars';
 import { dogs } from '@/data/dogs';
 import { reactionFixtures } from '@/data/reactionFixtures';
@@ -86,6 +86,7 @@ export default function Home() {
   const [analysisMessage, setAnalysisMessage] = useState(0);
   const [analysis, setAnalysis] = useState(null);
   const [lastAnalysis, setLastAnalysis] = useState(null);
+  const [reactionPreviewUrl, setReactionPreviewUrl] = useState('');
   const [stream, setStream] = useState(null);
   const [error, setError] = useState('');
 
@@ -100,6 +101,7 @@ export default function Home() {
   const recordingIntervalRef = useRef(null);
   const recordingTimeoutRef = useRef(null);
   const analysisAbortRef = useRef(null);
+  const reactionPreviewUrlRef = useRef('');
 
   const clearRecordingTimers = useCallback(() => {
     if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
@@ -114,7 +116,22 @@ export default function Home() {
     setStream(null);
   }, []);
 
+  const clearReactionPreview = useCallback(() => {
+    if (reactionPreviewUrlRef.current) URL.revokeObjectURL(reactionPreviewUrlRef.current);
+    reactionPreviewUrlRef.current = '';
+    setReactionPreviewUrl('');
+  }, []);
+
+  const showReactionPreview = useCallback((blob) => {
+    if (!blob?.size) return;
+    if (reactionPreviewUrlRef.current) URL.revokeObjectURL(reactionPreviewUrlRef.current);
+    const previewUrl = URL.createObjectURL(blob);
+    reactionPreviewUrlRef.current = previewUrl;
+    setReactionPreviewUrl(previewUrl);
+  }, []);
+
   const advanceCandidate = useCallback(() => {
+    clearReactionPreview();
     const previousId = currentDogRef.current.id;
     const next = takeNextDog(queueRef.current, dogs, previousId);
     queueRef.current = next.queue;
@@ -125,7 +142,7 @@ export default function Home() {
     setError('');
     setPhase('BROWSING');
     setTimeout(() => mainActionRef.current?.focus(), 50);
-  }, []);
+  }, [clearReactionPreview]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -154,6 +171,7 @@ export default function Home() {
     analysisAbortRef.current?.abort();
     if (recorderRef.current?.state !== 'inactive') recorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
+    if (reactionPreviewUrlRef.current) URL.revokeObjectURL(reactionPreviewUrlRef.current);
   }, [clearRecordingTimers]);
 
   const analyzeReaction = useCallback(async (recordedBlob = null, recordingDownload = null) => {
@@ -184,6 +202,7 @@ export default function Home() {
       }
 
       if (uploadBlob) {
+        showReactionPreview(uploadBlob);
         const extension = uploadBlob.type.includes('mp4') ? 'mp4' : 'webm';
         formData.append('video', uploadBlob, `reaction.${extension}`);
       }
@@ -241,7 +260,7 @@ export default function Home() {
     setAnalysis(payload);
     await delay(800);
     setPhase(payload.result);
-  }, [fixtureId, forceFallback]);
+  }, [fixtureId, forceFallback, showReactionPreview]);
 
   const stopRecording = useCallback((cancel = false) => {
     cancelledRef.current = cancel;
@@ -365,10 +384,11 @@ export default function Home() {
   const startReaction = useCallback(() => {
     if (phase !== 'BROWSING') return;
     setError('');
+    clearReactionPreview();
     candidateVideoRef.current?.play().catch(() => {});
     if (inputMode === 'webcam') void startWebcamRecording();
     else startFixtureRecording();
-  }, [inputMode, phase, startFixtureRecording, startWebcamRecording]);
+  }, [clearReactionPreview, inputMode, phase, startFixtureRecording, startWebcamRecording]);
 
   const finishEarly = useCallback(() => {
     if (inputMode === 'webcam') stopRecording(false);
@@ -430,15 +450,24 @@ export default function Home() {
           className={`candidate-card phase-${phase.toLowerCase()} ${result ? `result-${result.toLowerCase()}` : ''}`}
           style={{ '--dog-accent': currentDog.accent }}
         >
-          <CandidateMedia
-            key={currentDog.id}
-            dog={currentDog}
-            phase={phase}
-            videoRef={candidateVideoRef}
-            candidateNumber={candidateNumber}
-          />
-          <ReactionCamera stream={stream} phase={phase} countdown={countdown} inputMode={inputMode} />
-          <ResultOverlay result={result} />
+          {result ? (
+            <ReactionComparison
+              dog={currentDog}
+              reactionUrl={reactionPreviewUrl}
+              result={result}
+            />
+          ) : (
+            <>
+              <CandidateMedia
+                key={currentDog.id}
+                dog={currentDog}
+                phase={phase}
+                videoRef={candidateVideoRef}
+                candidateNumber={candidateNumber}
+              />
+              <ReactionCamera stream={stream} phase={phase} countdown={countdown} inputMode={inputMode} />
+            </>
+          )}
         </article>
 
         <aside className="control-panel">
