@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { CandidateMedia } from '@/components/CandidateMedia';
 import { DemoControls } from '@/components/DemoControls';
+import { MatchVerdictPanel } from '@/components/MatchVerdictPanel';
 import { PuppyDialog } from '@/components/PuppyDialog';
 import { ReactionCamera } from '@/components/ReactionCamera';
 import { ReactionComparison } from '@/components/ReactionComparison';
@@ -633,7 +634,7 @@ export default function Home() {
           )}
         </article>
 
-        <aside className="control-panel">
+        <aside className={`control-panel control-${phase.toLowerCase()}`}>
           {phase === 'BROWSING' && (
             <>
               <div className="eyebrow"><span>{String(candidateNumber).padStart(2, '0')}</span> Your dog decides</div>
@@ -679,14 +680,21 @@ export default function Home() {
             </div>
           )}
 
-          {['MATCH', 'PASS', 'RETRY'].includes(phase) && analysis && (
+          {phase === 'MATCH' && analysis && (
+            <MatchVerdictPanel
+              analysis={analysis}
+              showSource={demoOpen || analysis.source !== 'twelvelabs'}
+            />
+          )}
+
+          {['PASS', 'RETRY'].includes(phase) && analysis && (
             <div className="active-state result-state">
               <div className="eyebrow">
-                {phase === 'MATCH' ? <Heart size={15} fill="currentColor" /> : phase === 'RETRY' ? <Camera size={15} /> : <ShieldCheck size={15} />}
+                {phase === 'RETRY' ? <Camera size={15} /> : <ShieldCheck size={15} />}
                 {phase === 'RETRY' ? 'Capture check' : 'Decision explained'}
               </div>
-              <div className={`panel-verdict ${phase === 'MATCH' ? 'positive' : phase === 'RETRY' ? 'retry' : 'negative'}`}>
-                <span>{phase === 'MATCH' ? 'MATCH' : phase === 'RETRY' ? 'NO DOG' : 'PASS'}</span>
+              <div className={`panel-verdict ${phase === 'RETRY' ? 'retry' : 'negative'}`}>
+                <span>{phase === 'RETRY' ? 'NO DOG' : 'PASS'}</span>
                 <b>{phase === 'RETRY' ? 'NOT SCORED' : `${analysis.score > 0 ? '+' : ''}${analysis.score.toFixed(2)}`}</b>
               </div>
               {phase === 'RETRY' ? (
@@ -746,13 +754,13 @@ export default function Home() {
                 <button className="start-button puppy-button" type="button" onClick={() => setPuppyOpen(true)}>
                   <span className="button-icon"><PawPrint size={23} /></span>
                   <span>
-                    <b>{puppy.status === 'ready' ? 'Meet your puppy' : puppy.status === 'error' ? 'Retry puppy preview' : 'See the puppies'}</b>
+                    <b>{puppy.status === 'ready' ? 'The puppy has arrived' : puppy.status === 'error' ? 'Reopen the puppy portal' : 'Open the puppy portal'}</b>
                     <small>
                       {puppy.status === 'ready'
-                        ? `Ready${puppy.elapsedMs ? ` in ${(puppy.elapsedMs / 1000).toFixed(1)}s` : ''}`
+                        ? `Ready to hatch${puppy.elapsedMs ? ` · ${(puppy.elapsedMs / 1000).toFixed(1)}s` : ''}`
                         : puppy.status === 'error'
-                          ? 'Generation needs another try'
-                          : 'Already dreaming in the background'}
+                          ? 'The portal needs another try'
+                          : 'Combining ears, markings & floof'}
                     </small>
                   </span>
                   {puppy.status === 'generating' ? <LoaderCircle className="spin" size={21} /> : <Heart size={21} fill="currentColor" />}

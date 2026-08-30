@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Heart, LoaderCircle, PawPrint, RotateCcw, X } from 'lucide-react';
+import { Egg, Heart, LoaderCircle, PawPrint, RotateCcw, Sparkles, X } from 'lucide-react';
 
 export function PuppyDialog({ open, puppy, onClose, onRetry }) {
   const dialogRef = useRef(null);
@@ -37,13 +37,18 @@ export function PuppyDialog({ open, puppy, onClose, onRetry }) {
       <button className="puppy-dialog-close" type="button" onClick={onClose} aria-label="Close puppy preview">
         <X />
       </button>
-      <div className="puppy-dialog-kicker"><PawPrint size={15} /> The future is fluffy</div>
-      <h2 id="puppy-dialog-title" ref={headingRef} tabIndex={-1}>Your pawfect puppy</h2>
+      <div className="puppy-dialog-kicker"><PawPrint size={15} /> The puppy portal</div>
+      <h2 id="puppy-dialog-title" ref={headingRef} tabIndex={-1}>
+        {puppy.status === 'ready' ? 'The puppy has arrived!' : 'Future floof incoming'}
+      </h2>
 
       <div className={`puppy-portrait status-${puppy.status}`} aria-live="polite">
         {puppy.status === 'ready' && puppy.imageUrl ? (
-          // oxlint-disable-next-line next/no-img-element
-          <img src={puppy.imageUrl} alt="A playful AI-generated puppy portrait inspired by both dogs" />
+          <>
+            {/* oxlint-disable-next-line next/no-img-element */}
+            <img src={puppy.imageUrl} alt="A playful AI-generated puppy portrait inspired by both dogs" />
+            <div className="puppy-arrived-badge"><Sparkles /> Puppy hatched</div>
+          </>
         ) : puppy.status === 'error' ? (
           <div className="puppy-error-state">
             <PawPrint size={44} />
@@ -52,12 +57,16 @@ export function PuppyDialog({ open, puppy, onClose, onRetry }) {
           </div>
         ) : (
           <div className="puppy-loading-state">
-            <div className="puppy-countdown">
-              {countdown > 0 ? <b>{countdown}</b> : <LoaderCircle className="spin" />}
-              <Heart fill="currentColor" />
+            <div className={`puppy-hatch-stage ${countdown <= 3 ? 'almost-hatched' : ''}`}>
+              <span className="orbit-paw"><PawPrint fill="currentColor" /></span>
+              <span className="orbit-heart"><Heart fill="currentColor" /></span>
+              <div className="puppy-egg">
+                <Egg />
+                {countdown > 0 ? <b>{countdown}</b> : <LoaderCircle className="spin" />}
+              </div>
             </div>
-            <strong>{countdown > 0 ? 'Mixing the floof…' : 'Still fluffing the fur…'}</strong>
-            <span>Generation is already running in the background.</span>
+            <strong>{countdown > 0 ? 'Puppy hatching…' : 'Still fluffing the fur…'}</strong>
+            <span>Combining ears, markings, and maximum floof.</span>
           </div>
         )}
       </div>

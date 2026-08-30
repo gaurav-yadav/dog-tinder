@@ -165,6 +165,44 @@ button { cursor: pointer; }
 .analysis-source { display: block; margin-top: 11px; color: rgba(255,246,232,.3); font-family: var(--font-geist-mono); font-size: 8px; text-transform: uppercase; }
 .analysis-source.fallback-source { width: fit-content; padding: 6px 8px; border-radius: 7px; color: var(--yellow); background: rgba(255,216,90,.1); }
 
+.control-match { justify-content: center; }
+.control-match .action-area { margin-top: 22px; padding-top: 0; }
+.chemistry-panel { display: grid; gap: 14px; }
+.chemistry-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.confidence-read { padding: 6px 9px; border-radius: 999px; color: var(--mint); background: rgba(83,224,164,.1); border: 1px solid rgba(83,224,164,.18); font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .09em; white-space: nowrap; }
+.chemistry-verdict { display: flex; align-items: center; gap: 14px; margin-top: 2px; }
+.chemistry-heart { position: relative; width: 56px; height: 56px; flex: 0 0 auto; display: grid; place-items: center; color: white; border-radius: 20px 20px 17px 22px; background: var(--coral); box-shadow: 0 0 0 8px rgba(255,79,115,.1), 0 12px 34px rgba(255,79,115,.28); transform: rotate(-7deg); animation: chemistryBeat 1.8s ease-in-out infinite; }
+.chemistry-heart svg { width: 28px; transform: rotate(7deg); }
+.chemistry-verdict small, .chemistry-verdict strong { display: block; }
+.chemistry-verdict small { margin-bottom: 3px; color: var(--yellow); font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; }
+.chemistry-verdict strong { color: var(--mint); font-size: clamp(31px, 3.2vw, 45px); line-height: .9; letter-spacing: -.055em; }
+.vibe-meter { margin: 3px 0 2px; }
+.vibe-track { position: relative; height: 9px; border-radius: 999px; background: linear-gradient(90deg, var(--coral) 0 29%, var(--yellow) 43% 61%, var(--mint) 76% 100%); box-shadow: inset 0 0 0 2px rgba(255,255,255,.11); }
+.vibe-track > span { position: absolute; inset: -5px 6% -5px auto; width: 19px; border-radius: 50%; background: var(--cream); box-shadow: 0 0 0 6px rgba(255,246,232,.13), 0 0 25px var(--mint); animation: meterLand .8s cubic-bezier(.16,1,.3,1) both .25s; }
+.vibe-track > i { position: absolute; right: calc(6% + 7px); top: -16px; width: 5px; height: 9px; border-radius: 50%; background: var(--cream); transform: rotate(-18deg); }
+.vibe-zones { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 8px; color: rgba(255,246,232,.28); font-size: 7px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+.vibe-zones span:nth-child(2) { text-align: center; }
+.vibe-zones b { color: var(--mint); text-align: right; }
+.signal-stickers { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.signal-sticker { min-height: 67px; display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 9px; padding: 10px; border-radius: 15px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 25px rgba(0,0,0,.12); animation: stickerStamp .5s cubic-bezier(.16,1.3,.3,1) both var(--sticker-delay); }
+.signal-sticker:nth-child(odd) { transform: rotate(-1deg); }
+.signal-sticker:nth-child(even) { transform: rotate(1deg); }
+.signal-sticker > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--ink); background: var(--yellow); }
+.signal-sticker > span svg { width: 19px; }
+.signal-sticker strong, .signal-sticker small { display: block; }
+.signal-sticker strong { color: var(--cream); font-size: 10px; letter-spacing: .04em; }
+.signal-sticker small { margin-top: 4px; color: rgba(255,246,232,.47); font-size: 8px; }
+.signal-sticker.sticker-loud { background: linear-gradient(135deg, rgba(83,224,164,.13), rgba(255,255,255,.045)); border-color: rgba(83,224,164,.24); }
+.signal-sticker.sticker-loud > span { background: var(--mint); box-shadow: 0 0 0 5px rgba(83,224,164,.08); }
+.signal-sticker.sticker-quiet { opacity: .65; border-style: dashed; }
+.bark-translator { display: grid; grid-template-columns: auto 1fr; gap: 11px; align-items: start; padding: 12px 14px; border-radius: 16px 16px 16px 4px; color: var(--yellow); background: rgba(255,216,90,.075); border: 1px solid rgba(255,216,90,.18); }
+.bark-translator > svg { width: 19px; }
+.bark-translator span { display: block; margin-bottom: 4px; font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: .14em; }
+.bark-translator blockquote { margin: 0; color: var(--cream); font-size: 11px; font-weight: 720; line-height: 1.4; }
+.ai-evidence { margin-top: -2px; }
+.ai-evidence summary { cursor: pointer; width: fit-content; color: rgba(255,246,232,.43); font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
+.ai-evidence p { margin: 8px 0 0; padding-left: 10px; border-left: 2px solid rgba(255,216,90,.45); color: rgba(255,246,232,.53); font-size: 9px; line-height: 1.5; }
+
 .candidate-card.result-match, .candidate-card.result-pass { background: #21162b; }
 .reaction-comparison { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; padding: clamp(24px, 4vw, 54px); background: radial-gradient(circle at 50% 45%, rgba(83,224,164,.12), transparent 30%), linear-gradient(145deg, #21142d, #120b1c); animation: comparisonIn .6s cubic-bezier(.16,1,.3,1) both; }
 .comparison-pass { background: radial-gradient(circle at 50% 45%, rgba(189,179,202,.09), transparent 30%), linear-gradient(145deg, #21142d, #120b1c); }
@@ -232,10 +270,21 @@ button { cursor: pointer; }
 .puppy-loading-state strong, .puppy-error-state strong { font-size: 17px; }
 .puppy-loading-state span, .puppy-error-state span { color: rgba(255,246,232,.52); font-size: 11px; line-height: 1.5; }
 .puppy-error-state > svg { color: var(--yellow); }
-.puppy-countdown { position: relative; width: 100px; height: 100px; display: grid; place-items: center; color: var(--yellow); border: 1px dashed rgba(255,216,90,.58); border-radius: 50%; animation: puppyOrbit 8s linear infinite; }
-.puppy-countdown b { font-family: var(--font-geist-mono); font-size: 46px; letter-spacing: -.08em; animation: counterRotate 8s linear infinite; }
-.puppy-countdown > svg:last-child { position: absolute; right: -7px; top: 8px; width: 22px; color: var(--coral); animation: counterRotate 8s linear infinite; }
-.puppy-countdown .spin { width: 36px; animation: spin 1.2s linear infinite; }
+.puppy-hatch-stage { position: relative; width: 170px; height: 170px; display: grid; place-items: center; border: 1px dashed rgba(255,216,90,.38); border-radius: 50%; animation: puppyOrbit 9s linear infinite; }
+.puppy-hatch-stage::before, .puppy-hatch-stage::after { content: ''; position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 18px var(--mint); }
+.puppy-hatch-stage::before { left: 11px; top: 35px; }
+.puppy-hatch-stage::after { right: 17px; bottom: 29px; background: var(--coral); box-shadow: 0 0 18px var(--coral); }
+.orbit-paw, .orbit-heart { position: absolute; z-index: 2; display: grid; place-items: center; animation: counterRotate 9s linear infinite; }
+.orbit-paw { top: -9px; color: var(--yellow); }
+.orbit-heart { right: -8px; color: var(--coral); }
+.orbit-paw svg, .orbit-heart svg { width: 22px; }
+.puppy-egg { position: relative; width: 120px; height: 145px; display: grid; place-items: center; color: var(--yellow); animation: counterRotate 9s linear infinite, eggWobble 1.5s ease-in-out infinite; }
+.puppy-egg > svg:first-child { position: absolute; width: 116px; height: 142px; stroke-width: 1.2; filter: drop-shadow(0 0 18px rgba(255,216,90,.25)); }
+.puppy-egg b { position: relative; z-index: 2; color: var(--cream); font-family: var(--font-geist-mono); font-size: 43px; letter-spacing: -.08em; }
+.puppy-egg .spin { position: relative; z-index: 2; width: 34px; }
+.almost-hatched .puppy-egg { animation: counterRotate 9s linear infinite, eggWobble .42s ease-in-out infinite; }
+.puppy-arrived-badge { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 7px; padding: 8px 12px; white-space: nowrap; color: var(--ink); background: var(--yellow); border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.28); font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; animation: badgePop .55s cubic-bezier(.16,1.4,.3,1) both .35s; }
+.puppy-arrived-badge svg { width: 15px; }
 .puppy-disclaimer { max-width: 390px; margin: 17px auto 0; color: rgba(255,246,232,.45); text-align: center; font-size: 10px; line-height: 1.5; }
 .puppy-dialog-actions { margin-top: 20px; display: flex; justify-content: center; gap: 9px; }
 .puppy-dialog-actions button { min-height: 46px; padding: 0 21px; border-radius: 14px; font-size: 11px; font-weight: 850; }
@@ -255,6 +304,11 @@ button { cursor: pointer; }
 @keyframes puppyReveal { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: scale(1); } }
 @keyframes puppyOrbit { to { transform: rotate(360deg); } }
 @keyframes counterRotate { to { transform: rotate(-360deg); } }
+@keyframes chemistryBeat { 50% { transform: rotate(-3deg) scale(1.07); } }
+@keyframes meterLand { from { right: 70%; opacity: 0; } to { right: 6%; opacity: 1; } }
+@keyframes stickerStamp { from { opacity: 0; transform: translateY(8px) rotate(-5deg) scale(.82); } to { opacity: 1; transform: translateY(0) rotate(0) scale(1); } }
+@keyframes eggWobble { 0%, 100% { translate: 0 0; rotate: -2deg; } 50% { translate: 0 -3px; rotate: 2deg; } }
+@keyframes badgePop { from { opacity: 0; transform: translateX(-50%) scale(.7); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
 
 @media (max-height: 820px) and (min-width: 901px) {
   .demo-grid { margin-top: 24px; min-height: calc(100svh - 106px); }
@@ -263,6 +317,9 @@ button { cursor: pointer; }
   .signal-preview { margin: 26px 0 22px; padding: 16px 0; }
   .signal-preview div { padding: 5px 0; }
   .action-area { padding-top: 16px; }
+  .chemistry-panel { gap: 10px; }
+  .signal-sticker { min-height: 59px; padding: 8px; }
+  .control-match .action-area { margin-top: 15px; }
 }
 
 @media (max-width: 900px) {
@@ -290,4 +347,7 @@ button { cursor: pointer; }
   .puppy-dialog { width: 100%; max-width: none; max-height: 92svh; margin: auto 0 0; padding: 24px 17px calc(20px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; }
   .puppy-dialog h2 { margin-bottom: 17px; }
   .puppy-portrait { border-radius: 20px; }
+  .chemistry-heading { align-items: flex-start; }
+  .confidence-read { white-space: normal; text-align: right; }
+  .signal-stickers { grid-template-columns: 1fr; }
 }
