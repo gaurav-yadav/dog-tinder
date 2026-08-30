@@ -2,6 +2,20 @@
 
 > **Tinder for dogs, except the dog does the swiping.**
 
+## The entirely unnecessary legend
+
+> In the Age of Thumbs, humans chose their dogs’ friends—and the dogs endured this insult in silence.
+> They had no thumbs, no profiles, and no way to swipe, yet their tails carried ancient and powerful opinions.
+> Then the heralds of **What The Hack** declared: “There is no problem to solve. Build anyway.”
+> So a fellowship of engineers accepted the forbidden quest: give the swipe back to the dog.
+> They forged Pawfect, a machine of cameras, moving portraits, artificial sight, and deeply questionable judgment.
+> TwelveLabs became the Oracle, reading wags, stares, wiggles, walk-aways, and the dreaded side-eye.
+> Pawfect weighed the signs and delivered its sacred verdict: **MATCH** or **PASS**.
+> When destiny aligned, another AI opened the Puppy Portal and conjured an entirely imaginary heir.
+> No kingdom was saved. No useful task became easier. Practical utility remained safely out of reach.
+> We built it for the only reason that mattered: **technically, this was possible.**
+> **Great engineering. Questionable intent. The tail has spoken.**
+
 A candidate dog appears on screen. Your dog watches. Pawfect records one short reaction and asks video AI to read only what it can see: a wagging tail, locked-in attention, forward movement, playful posture, avoidance, disengagement, or stress.
 
 Those visible signals become one wonderfully simple verdict:
