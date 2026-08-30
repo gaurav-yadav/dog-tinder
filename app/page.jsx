@@ -44,7 +44,7 @@ export default function Home() {
   const [phase, setPhase] = useState('BROWSING');
   const [currentDog, setCurrentDog] = useState(dogs[0]);
   const [candidateNumber, setCandidateNumber] = useState(1);
-  const [inputMode, setInputMode] = useState('fixture');
+  const [inputMode, setInputMode] = useState('webcam');
   const [fixtureId, setFixtureId] = useState('positive-01');
   const [forceFallback, setForceFallback] = useState(false);
   const [demoEnabled, setDemoEnabled] = useState(process.env.NEXT_PUBLIC_DEMO_MODE === 'true');
