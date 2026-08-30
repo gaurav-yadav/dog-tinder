@@ -99,6 +99,7 @@ export default function Home() {
   const cancelledRef = useRef(false);
   const recordingIntervalRef = useRef(null);
   const recordingTimeoutRef = useRef(null);
+  const resultTimeoutRef = useRef(null);
   const analysisAbortRef = useRef(null);
 
   const clearRecordingTimers = useCallback(() => {
@@ -115,6 +116,8 @@ export default function Home() {
   }, []);
 
   const advanceCandidate = useCallback(() => {
+    if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
+    resultTimeoutRef.current = null;
     const previousId = currentDogRef.current.id;
     const next = takeNextDog(queueRef.current, dogs, previousId);
     queueRef.current = next.queue;
@@ -149,14 +152,9 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [phase, analysis]);
 
-  useEffect(() => {
-    if (phase !== 'MATCH' && phase !== 'PASS') return undefined;
-    const timer = setTimeout(advanceCandidate, 2700);
-    return () => clearTimeout(timer);
-  }, [phase, advanceCandidate]);
-
   useEffect(() => () => {
     clearRecordingTimers();
+    if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
     analysisAbortRef.current?.abort();
     if (recorderRef.current?.state !== 'inactive') recorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -247,7 +245,8 @@ export default function Home() {
     setAnalysis(payload);
     await delay(800);
     setPhase(payload.result);
-  }, [fixtureId, forceFallback]);
+    resultTimeoutRef.current = setTimeout(advanceCandidate, 2700);
+  }, [advanceCandidate, fixtureId, forceFallback]);
 
   const stopRecording = useCallback((cancel = false) => {
     cancelledRef.current = cancel;
@@ -540,8 +539,8 @@ export default function Home() {
               </button>
             )}
             {(phase === 'MATCH' || phase === 'PASS') && (
-              <button className="start-button incoming-button" type="button" disabled>
-                <Sparkles size={20} /> Next dog incoming…
+              <button className="start-button incoming-button" type="button" onClick={advanceCandidate}>
+                <Sparkles size={20} /> Next dog now
               </button>
             )}
             <p className="privacy-note"><ShieldCheck size={11} /> Camera stays on only for one short reaction clip.</p>
