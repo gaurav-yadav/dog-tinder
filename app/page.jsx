@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BrainCircuit,
   Camera,
+  Eye,
   Heart,
   LoaderCircle,
   PawPrint,
@@ -637,16 +638,34 @@ export default function Home() {
         <aside className={`control-panel control-${phase.toLowerCase()}`}>
           {phase === 'BROWSING' && (
             <>
-              <div className="eyebrow"><span>{String(candidateNumber).padStart(2, '0')}</span> Your dog decides</div>
+              <div className="browse-brand" aria-label="Pawfect — canine chemistry powered by AI">
+                <span className="browse-brand-mark"><PawPrint /></span>
+                <span><strong>PAWFECT</strong><small>Canine chemistry · read by AI</small></span>
+              </div>
+              <div className="eyebrow browse-eyebrow"><span>{String(candidateNumber).padStart(2, '0')}</span> Your dog decides <Heart size={14} fill="currentColor" /></div>
               <div className="panel-heading">
                 <h2>Let the tail<br />do the swiping.</h2>
-                <p>Show your dog {currentDog.name}&apos;s clip. We record one short reaction and AI reads the visible body language.</p>
+                <p>Show your dog {currentDog.name}&apos;s clip. We capture one short reaction, then AI reads the visible dog body language.</p>
               </div>
               <div className="signal-preview" aria-label="Signals we will measure">
-                <p>Watching for</p>
-                <div><span>Tail telemetry</span><b>WAGS</b></div>
-                <div><span>Visual attention</span><b>FOCUS</b></div>
-                <div><span>Body posture</span><b>VIBES</b></div>
+                <p><Sparkles size={15} /> AI is watching for</p>
+                <div className="signal-preview-list">
+                  <div className="signal-preview-card">
+                    <span className="signal-preview-icon"><PawPrint /></span>
+                    <span><strong>Tail telemetry</strong><small>Every wag tells a story</small></span>
+                    <b>WAGS</b>
+                  </div>
+                  <div className="signal-preview-card">
+                    <span className="signal-preview-icon"><Eye /></span>
+                    <span><strong>Visual attention</strong><small>Eyes locked on the candidate</small></span>
+                    <b>FOCUS</b>
+                  </div>
+                  <div className="signal-preview-card">
+                    <span className="signal-preview-icon"><Sparkles /></span>
+                    <span><strong>Body posture</strong><small>Loose, playful, or not today</small></span>
+                    <b>VIBES</b>
+                  </div>
+                </div>
               </div>
             </>
           )}
