@@ -69,5 +69,15 @@ export const reactionFixtures = {
   },
 };
 
-export const safeFallbackReaction = reactionFixtures.neutral.fallbackAnalysis;
-
+export const safeFallbackReaction = {
+  tailWagging: 0,
+  approaching: 0,
+  sustainedAttention: 0,
+  playfulBodyLanguage: 0,
+  excitement: 0,
+  avoidance: 0,
+  disengagement: 0,
+  stressSignals: 0,
+  confidence: 0,
+  summary: 'The live reaction could not be verified. Record this dog again for a real verdict.',
+};

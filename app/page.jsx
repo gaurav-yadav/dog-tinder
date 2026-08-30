@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { fixWebmDuration } from '@fix-webm-duration/fix';
 import {
   BrainCircuit,
   Camera,
@@ -19,7 +18,7 @@ import { ReactionCamera } from '@/components/ReactionCamera';
 import { ReactionComparison } from '@/components/ReactionComparison';
 import { SignalBars } from '@/components/SignalBars';
 import { dogs } from '@/data/dogs';
-import { reactionFixtures } from '@/data/reactionFixtures';
+import { reactionFixtures, safeFallbackReaction } from '@/data/reactionFixtures';
 import {
   DOG_REACTION_PROMPT,
   TWELVELABS_ENDPOINT,
@@ -67,6 +66,10 @@ function saveDebugRecording(recordingBlob) {
 function getRecorderMimeType() {
   if (typeof MediaRecorder === 'undefined') return '';
   return [
+    // A finalized MP4 is the most reliable direct upload for TwelveLabs. Current
+    // Chrome exposes MP4 MediaRecorder support through isTypeSupported().
+    'video/mp4',
+    'video/mp4;codecs=avc1.42E01E',
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',
@@ -186,6 +189,7 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append('fixtureId', fixtureId);
+      formData.append('inputMode', inputMode);
       formData.append('forceFallback', String(forceFallback));
 
       let uploadBlob = recordedBlob;
@@ -209,7 +213,9 @@ export default function Home() {
 
       const abortController = new AbortController();
       analysisAbortRef.current = abortController;
-      const timeout = setTimeout(() => abortController.abort(), 70_000);
+      // TwelveLabs can take close to a minute under load; leave enough headroom
+      // for its server-side timeout and response transfer.
+      const timeout = setTimeout(() => abortController.abort(), 100_000);
       const response = await fetch('/api/analyze-reaction', {
         method: 'POST',
         body: formData,
@@ -223,7 +229,9 @@ export default function Home() {
         throw new Error('The reaction service returned an invalid result.');
       }
     } catch (requestError) {
-      const localReaction = reactionFixtures[fixtureId]?.fallbackAnalysis || reactionFixtures.neutral.fallbackAnalysis;
+      const localReaction = inputMode === 'fixture'
+        ? reactionFixtures[fixtureId]?.fallbackAnalysis || safeFallbackReaction
+        : safeFallbackReaction;
       payload = {
         ...scoreReaction(localReaction),
         source: 'client-fallback',
@@ -260,7 +268,7 @@ export default function Home() {
     setAnalysis(payload);
     await delay(800);
     setPhase(payload.result);
-  }, [fixtureId, forceFallback, showReactionPreview]);
+  }, [fixtureId, forceFallback, inputMode, showReactionPreview]);
 
   const stopRecording = useCallback((cancel = false) => {
     cancelledRef.current = cancel;
@@ -340,19 +348,28 @@ export default function Home() {
           return;
         }
 
-        // Chrome MediaRecorder WebMs omit duration metadata. TwelveLabs reads those
-        // otherwise-valid clips as 0 seconds, so patch the metadata before saving/uploading.
-        const reactionBlob = rawReactionBlob.type.includes('webm')
-          ? await fixWebmDuration(rawReactionBlob, recordedDuration)
-          : rawReactionBlob;
-        const recordingDownload = saveDebugRecording(reactionBlob);
-        await analyzeReaction(reactionBlob, recordingDownload);
+        // Do not mutate the container after Chrome finalizes it. The old WebM
+        // duration patch corrupted multi-keyframe recordings and caused
+        // TwelveLabs to return video_file_broken.
+        const recordingDownload = saveDebugRecording(rawReactionBlob);
+        await analyzeReaction(rawReactionBlob, recordingDownload);
+      };
+
+      recorder.onerror = () => {
+        clearRecordingTimers();
+        releaseCamera(cameraStream);
+        chunksRef.current = [];
+        recorderRef.current = null;
+        setError('Chrome could not finish this recording. Try again or use the demo reaction.');
+        setPhase('BROWSING');
       };
 
       setCountdown(12);
       setPhase('RECORDING');
       recordingStartedAt = performance.now();
-      recorder.start(250);
+      // Let Chrome emit one complete, finalized file when stop() is called.
+      // Timesliced MP4/WebM fragments are not valid standalone upload files.
+      recorder.start();
 
       recordingIntervalRef.current = setInterval(() => {
         const secondsLeft = Math.max(0, 12 - Math.floor((performance.now() - recordingStartedAt) / 1000));
@@ -551,7 +568,11 @@ export default function Home() {
                   <p className="reaction-summary">“{analysis.reaction.summary}”</p>
                 </>
               )}
-              {demoOpen && <small className="analysis-source">Source: {analysis.source}</small>}
+              {(demoOpen || analysis.source !== 'twelvelabs') && (
+                <small className={`analysis-source ${analysis.source !== 'twelvelabs' ? 'fallback-source' : ''}`}>
+                  {analysis.source === 'twelvelabs' ? 'Source: TwelveLabs' : 'Demo fallback · not a live AI verdict'}
+                </small>
+              )}
             </div>
           )}
 

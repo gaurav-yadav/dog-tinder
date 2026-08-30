@@ -163,6 +163,7 @@ button { cursor: pointer; }
 .signal-results.compact .signal-row { gap: 3px; }
 .signal-results.compact .signal-track { height: 4px; }
 .analysis-source { display: block; margin-top: 11px; color: rgba(255,246,232,.3); font-family: var(--font-geist-mono); font-size: 8px; text-transform: uppercase; }
+.analysis-source.fallback-source { width: fit-content; padding: 6px 8px; border-radius: 7px; color: var(--yellow); background: rgba(255,216,90,.1); }
 
 .candidate-card.result-match, .candidate-card.result-pass { background: #21162b; }
 .reaction-comparison { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; padding: clamp(24px, 4vw, 54px); background: radial-gradient(circle at 50% 45%, rgba(83,224,164,.12), transparent 30%), linear-gradient(145deg, #21142d, #120b1c); animation: comparisonIn .6s cubic-bezier(.16,1,.3,1) both; }
