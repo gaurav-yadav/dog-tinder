@@ -14,11 +14,12 @@
     "format": "oxfmt"
   },
   "dependencies": {
+    "@fix-webm-duration/fix": "^1.0.1",
+    "lucide-react": "1.31.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-server-dom-webpack": "19.2.6",
-    "vinext": "1.0.0-beta.5",
-    "lucide-react": "1.31.0"
+    "vinext": "1.0.0-beta.5"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",

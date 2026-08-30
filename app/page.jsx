@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { fixWebmDuration } from '@fix-webm-duration/fix';
 import {
   BrainCircuit,
   Camera,
@@ -286,6 +287,7 @@ export default function Home() {
       cancelledRef.current = false;
 
       const mimeType = getRecorderMimeType();
+      let recordingStartedAt = 0;
       const recorder = new MediaRecorder(cameraStream, {
         ...(mimeType ? { mimeType } : {}),
         // Keep a 12-second Chrome clip under the local/API upload ceiling.
@@ -299,7 +301,8 @@ export default function Home() {
 
       recorder.onstop = async () => {
         clearRecordingTimers();
-        const reactionBlob = new Blob(chunksRef.current, { type: recorder.mimeType || 'video/webm' });
+        const rawReactionBlob = new Blob(chunksRef.current, { type: recorder.mimeType || 'video/webm' });
+        const recordedDuration = Math.max(0, performance.now() - recordingStartedAt);
         chunksRef.current = [];
         recorderRef.current = null;
         releaseCamera(cameraStream);
@@ -309,23 +312,34 @@ export default function Home() {
           return;
         }
 
-        if (!reactionBlob.size) {
+        if (!rawReactionBlob.size) {
           setError('The camera clip was empty. Try again or use the demo reaction.');
           setPhase('BROWSING');
           return;
         }
 
+        if (recordedDuration < 4_000) {
+          setError('Record for at least 4 seconds so TwelveLabs can analyze the clip.');
+          setPhase('BROWSING');
+          return;
+        }
+
+        // Chrome MediaRecorder WebMs omit duration metadata. TwelveLabs reads those
+        // otherwise-valid clips as 0 seconds, so patch the metadata before saving/uploading.
+        const reactionBlob = rawReactionBlob.type.includes('webm')
+          ? await fixWebmDuration(rawReactionBlob, recordedDuration)
+          : rawReactionBlob;
         const recordingDownload = saveDebugRecording(reactionBlob);
         await analyzeReaction(reactionBlob, recordingDownload);
       };
 
       setCountdown(12);
       setPhase('RECORDING');
+      recordingStartedAt = performance.now();
       recorder.start(250);
-      const startedAt = Date.now();
 
       recordingIntervalRef.current = setInterval(() => {
-        const secondsLeft = Math.max(0, 12 - Math.floor((Date.now() - startedAt) / 1000));
+        const secondsLeft = Math.max(0, 12 - Math.floor((performance.now() - recordingStartedAt) / 1000));
         setCountdown(secondsLeft);
       }, 250);
 
