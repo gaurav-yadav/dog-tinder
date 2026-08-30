@@ -19,6 +19,11 @@ import { ResultOverlay } from '@/components/ResultOverlay';
 import { SignalBars } from '@/components/SignalBars';
 import { dogs } from '@/data/dogs';
 import { reactionFixtures } from '@/data/reactionFixtures';
+import {
+  DOG_REACTION_PROMPT,
+  TWELVELABS_ENDPOINT,
+  TWELVELABS_MODEL,
+} from '@/lib/analysisConfig';
 import { shuffleDogs, takeNextDog } from '@/lib/candidateQueue';
 import { scoreReaction } from '@/lib/scoring';
 
@@ -30,6 +35,33 @@ const analysisMessages = [
 ];
 
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+const debugSaveRecordings = process.env.NEXT_PUBLIC_DEBUG_SAVE_RECORDINGS === 'true';
+
+function saveDebugRecording(recordingBlob) {
+  if (!debugSaveRecordings || !recordingBlob?.size) return null;
+
+  const completedAt = new Date();
+  const timestamp = completedAt.toISOString().replace(/[:.]/g, '-');
+  const extension = recordingBlob.type.includes('mp4') ? 'mp4' : 'webm';
+  const filename = `pawfect-reaction-${timestamp}.${extension}`;
+  const objectUrl = URL.createObjectURL(recordingBlob);
+  const downloadLink = document.createElement('a');
+
+  downloadLink.href = objectUrl;
+  downloadLink.download = filename;
+  downloadLink.hidden = true;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  downloadLink.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+
+  return {
+    recordedToDisk: true,
+    recordingFilename: filename,
+    recordingLocation: 'Chrome Downloads (browser-managed)',
+    recordingSavedAt: completedAt.toISOString(),
+  };
+}
 
 function getRecorderMimeType() {
   if (typeof MediaRecorder === 'undefined') return '';
@@ -52,6 +84,7 @@ export default function Home() {
   const [countdown, setCountdown] = useState(12);
   const [analysisMessage, setAnalysisMessage] = useState(0);
   const [analysis, setAnalysis] = useState(null);
+  const [lastAnalysis, setLastAnalysis] = useState(null);
   const [stream, setStream] = useState(null);
   const [error, setError] = useState('');
 
@@ -128,7 +161,7 @@ export default function Home() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
   }, [clearRecordingTimers]);
 
-  const analyzeReaction = useCallback(async (recordedBlob = null) => {
+  const analyzeReaction = useCallback(async (recordedBlob = null, recordingDownload = null) => {
     setError('');
     setAnalysis(null);
     setAnalysisMessage(0);
@@ -181,11 +214,35 @@ export default function Home() {
         ...scoreReaction(localReaction),
         source: 'client-fallback',
         fallbackReason: requestError instanceof Error ? requestError.message : 'Analysis failed.',
+        analysisReceipt: {
+          provider: 'TwelveLabs',
+          attempted: true,
+          succeeded: false,
+          model: TWELVELABS_MODEL,
+          endpoint: TWELVELABS_ENDPOINT,
+          prompt: DOG_REACTION_PROMPT,
+          requestId: null,
+          finishReason: null,
+          recordedToDisk: false,
+          completedAt: new Date().toISOString(),
+        },
       };
     }
 
+    payload = {
+      ...payload,
+      analysisReceipt: {
+        ...payload.analysisReceipt,
+        recordedToDisk: Boolean(recordingDownload),
+        recordingFilename: recordingDownload?.recordingFilename || null,
+        recordingLocation: recordingDownload?.recordingLocation || null,
+        recordingSavedAt: recordingDownload?.recordingSavedAt || null,
+      },
+    };
+
     const remainingDemoTime = Math.max(0, 2600 - (Date.now() - startedAt));
     await delay(remainingDemoTime);
+    setLastAnalysis(payload);
     setAnalysis(payload);
     await delay(800);
     setPhase(payload.result);
@@ -231,7 +288,8 @@ export default function Home() {
       const mimeType = getRecorderMimeType();
       const recorder = new MediaRecorder(cameraStream, {
         ...(mimeType ? { mimeType } : {}),
-        videoBitsPerSecond: 1_500_000,
+        // Keep a 12-second Chrome clip under the local/API upload ceiling.
+        videoBitsPerSecond: 450_000,
       });
       recorderRef.current = recorder;
 
@@ -257,7 +315,8 @@ export default function Home() {
           return;
         }
 
-        await analyzeReaction(reactionBlob);
+        const recordingDownload = saveDebugRecording(reactionBlob);
+        await analyzeReaction(reactionBlob, recordingDownload);
       };
 
       setCountdown(12);
@@ -351,6 +410,7 @@ export default function Home() {
         inputMode={inputMode}
         fixtureId={fixtureId}
         forceFallback={forceFallback}
+        lastAnalysis={lastAnalysis}
         disabled={busy}
         onInputMode={setInputMode}
         onFixture={setFixtureId}

@@ -41,6 +41,14 @@ Optional prerecorded reaction clips belong in `public/reactions/` as `positive-0
 
 Use the **Demo** control to switch between prerecorded and webcam reactions or force the fallback path.
 
+To keep a local copy of every completed webcam reaction while debugging, set:
+
+```text
+NEXT_PUBLIC_DEBUG_SAVE_RECORDINGS=true
+```
+
+Chrome will download each clip before analysis with a timestamped `pawfect-reaction-*.webm` filename. The demo analysis receipt shows the exact filename and reports the location as Chrome Downloads; browsers do not expose the absolute Downloads folder path to the page.
+
 ## Checks
 
 ```bash
