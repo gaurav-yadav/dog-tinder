@@ -167,41 +167,42 @@ button { cursor: pointer; }
 
 .control-match { justify-content: center; }
 .control-match .action-area { margin-top: 22px; padding-top: 0; }
-.chemistry-panel { display: grid; gap: 14px; }
+.chemistry-panel { display: grid; gap: 18px; }
 .chemistry-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.confidence-read { padding: 6px 9px; border-radius: 999px; color: var(--mint); background: rgba(83,224,164,.1); border: 1px solid rgba(83,224,164,.18); font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .09em; white-space: nowrap; }
+.chemistry-heading .eyebrow { font-size: 13px; letter-spacing: .14em; }
+.confidence-read { padding: 8px 12px; border-radius: 999px; color: var(--mint); background: rgba(83,224,164,.1); border: 1px solid rgba(83,224,164,.18); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
 .chemistry-verdict { display: flex; align-items: center; gap: 14px; margin-top: 2px; }
 .chemistry-heart { position: relative; width: 56px; height: 56px; flex: 0 0 auto; display: grid; place-items: center; color: white; border-radius: 20px 20px 17px 22px; background: var(--coral); box-shadow: 0 0 0 8px rgba(255,79,115,.1), 0 12px 34px rgba(255,79,115,.28); transform: rotate(-7deg); animation: chemistryBeat 1.8s ease-in-out infinite; }
 .chemistry-heart svg { width: 28px; transform: rotate(7deg); }
 .chemistry-verdict small, .chemistry-verdict strong { display: block; }
-.chemistry-verdict small { margin-bottom: 3px; color: var(--yellow); font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; }
+.chemistry-verdict small { margin-bottom: 5px; color: var(--yellow); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; }
 .chemistry-verdict strong { color: var(--mint); font-size: clamp(31px, 3.2vw, 45px); line-height: .9; letter-spacing: -.055em; }
 .vibe-meter { margin: 3px 0 2px; }
 .vibe-track { position: relative; height: 9px; border-radius: 999px; background: linear-gradient(90deg, var(--coral) 0 29%, var(--yellow) 43% 61%, var(--mint) 76% 100%); box-shadow: inset 0 0 0 2px rgba(255,255,255,.11); }
 .vibe-track > span { position: absolute; inset: -5px 6% -5px auto; width: 19px; border-radius: 50%; background: var(--cream); box-shadow: 0 0 0 6px rgba(255,246,232,.13), 0 0 25px var(--mint); animation: meterLand .8s cubic-bezier(.16,1,.3,1) both .25s; }
 .vibe-track > i { position: absolute; right: calc(6% + 7px); top: -16px; width: 5px; height: 9px; border-radius: 50%; background: var(--cream); transform: rotate(-18deg); }
-.vibe-zones { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 8px; color: rgba(255,246,232,.28); font-size: 7px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+.vibe-zones { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 10px; color: rgba(255,246,232,.36); font-size: 9px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
 .vibe-zones span:nth-child(2) { text-align: center; }
 .vibe-zones b { color: var(--mint); text-align: right; }
-.signal-stickers { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.signal-sticker { min-height: 67px; display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 9px; padding: 10px; border-radius: 15px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 25px rgba(0,0,0,.12); animation: stickerStamp .5s cubic-bezier(.16,1.3,.3,1) both var(--sticker-delay); }
+.signal-stickers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.signal-sticker { min-height: 92px; display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 14px; padding: 15px; border-radius: 19px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 25px rgba(0,0,0,.12); animation: stickerStamp .5s cubic-bezier(.16,1.3,.3,1) both var(--sticker-delay); }
 .signal-sticker:nth-child(odd) { transform: rotate(-1deg); }
 .signal-sticker:nth-child(even) { transform: rotate(1deg); }
-.signal-sticker > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--ink); background: var(--yellow); }
-.signal-sticker > span svg { width: 19px; }
+.signal-sticker > span { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; color: var(--ink); background: var(--yellow); }
+.signal-sticker > span svg { width: 25px; height: 25px; }
 .signal-sticker strong, .signal-sticker small { display: block; }
-.signal-sticker strong { color: var(--cream); font-size: 10px; letter-spacing: .04em; }
-.signal-sticker small { margin-top: 4px; color: rgba(255,246,232,.47); font-size: 8px; }
+.signal-sticker strong { color: var(--cream); font-size: 14px; line-height: 1.1; letter-spacing: .025em; }
+.signal-sticker small { margin-top: 7px; color: rgba(255,246,232,.57); font-size: 11px; line-height: 1.25; }
 .signal-sticker.sticker-loud { background: linear-gradient(135deg, rgba(83,224,164,.13), rgba(255,255,255,.045)); border-color: rgba(83,224,164,.24); }
 .signal-sticker.sticker-loud > span { background: var(--mint); box-shadow: 0 0 0 5px rgba(83,224,164,.08); }
 .signal-sticker.sticker-quiet { opacity: .65; border-style: dashed; }
-.bark-translator { display: grid; grid-template-columns: auto 1fr; gap: 11px; align-items: start; padding: 12px 14px; border-radius: 16px 16px 16px 4px; color: var(--yellow); background: rgba(255,216,90,.075); border: 1px solid rgba(255,216,90,.18); }
-.bark-translator > svg { width: 19px; }
-.bark-translator span { display: block; margin-bottom: 4px; font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: .14em; }
-.bark-translator blockquote { margin: 0; color: var(--cream); font-size: 11px; font-weight: 720; line-height: 1.4; }
+.bark-translator { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; padding: 17px 18px; border-radius: 19px 19px 19px 5px; color: var(--yellow); background: rgba(255,216,90,.075); border: 1px solid rgba(255,216,90,.18); }
+.bark-translator > svg { width: 23px; height: 23px; }
+.bark-translator span { display: block; margin-bottom: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .14em; }
+.bark-translator blockquote { margin: 0; color: var(--cream); font-size: 14px; font-weight: 720; line-height: 1.45; }
 .ai-evidence { margin-top: -2px; }
-.ai-evidence summary { cursor: pointer; width: fit-content; color: rgba(255,246,232,.43); font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
-.ai-evidence p { margin: 8px 0 0; padding-left: 10px; border-left: 2px solid rgba(255,216,90,.45); color: rgba(255,246,232,.53); font-size: 9px; line-height: 1.5; }
+.ai-evidence summary { cursor: pointer; width: fit-content; color: rgba(255,246,232,.5); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
+.ai-evidence p { margin: 10px 0 0; padding-left: 12px; border-left: 2px solid rgba(255,216,90,.45); color: rgba(255,246,232,.6); font-size: 11px; line-height: 1.55; }
 
 .candidate-card.result-match, .candidate-card.result-pass { background: #21162b; }
 .reaction-comparison { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; padding: clamp(24px, 4vw, 54px); background: radial-gradient(circle at 50% 45%, rgba(83,224,164,.12), transparent 30%), linear-gradient(145deg, #21142d, #120b1c); animation: comparisonIn .6s cubic-bezier(.16,1,.3,1) both; }
@@ -247,7 +248,9 @@ button { cursor: pointer; }
 .match-actions { display: grid; gap: 10px; }
 .puppy-button { color: var(--ink); background: linear-gradient(135deg, var(--yellow), #ffb85a); box-shadow: 0 15px 45px rgba(255,216,90,.2); }
 .puppy-button .button-icon { background: rgba(255,255,255,.28); }
-.next-dog-secondary { min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; color: rgba(255,246,232,.58); background: transparent; border: 1px solid rgba(255,255,255,.13); font-size: 11px; font-weight: 800; }
+.puppy-button b { font-size: 17px; }
+.puppy-button small { margin-top: 6px; font-size: 12px; }
+.next-dog-secondary { min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 15px; color: rgba(255,246,232,.62); background: transparent; border: 1px solid rgba(255,255,255,.13); font-size: 13px; font-weight: 800; }
 .next-dog-secondary:hover { color: var(--cream); background: rgba(255,255,255,.06); }
 .retry-button { display: flex; justify-content: center; color: var(--ink); background: var(--yellow); box-shadow: 0 15px 45px rgba(255,216,90,.14); }
 .capture-warning { display: grid; grid-template-columns: auto 1fr; gap: 12px; margin-top: 22px; padding: 17px; border: 1px solid rgba(255,216,90,.22); border-radius: 16px; color: var(--yellow); background: rgba(255,216,90,.08); }
@@ -310,6 +313,16 @@ button { cursor: pointer; }
 @keyframes eggWobble { 0%, 100% { translate: 0 0; rotate: -2deg; } 50% { translate: 0 -3px; rotate: 2deg; } }
 @keyframes badgePop { from { opacity: 0; transform: translateX(-50%) scale(.7); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
 
+/* 16-inch MacBook Pro and similarly roomy laptop displays. */
+@media (min-width: 1500px) and (min-height: 900px) {
+  .demo-grid { grid-template-columns: minmax(0, 1.55fr) minmax(500px, .82fr); gap: clamp(48px, 4vw, 72px); }
+  .candidate-card, .control-panel { min-height: min(78vh, 850px); }
+  .control-panel { max-width: 520px; }
+  .chemistry-panel { gap: 20px; }
+  .signal-sticker { min-height: 98px; }
+  .control-match .action-area { margin-top: 26px; }
+}
+
 @media (max-height: 820px) and (min-width: 901px) {
   .demo-grid { margin-top: 24px; min-height: calc(100svh - 106px); }
   .candidate-card, .control-panel { min-height: min(72vh, 650px); }
@@ -317,8 +330,11 @@ button { cursor: pointer; }
   .signal-preview { margin: 26px 0 22px; padding: 16px 0; }
   .signal-preview div { padding: 5px 0; }
   .action-area { padding-top: 16px; }
-  .chemistry-panel { gap: 10px; }
-  .signal-sticker { min-height: 59px; padding: 8px; }
+  .chemistry-panel { gap: 12px; }
+  .signal-sticker { min-height: 78px; grid-template-columns: 46px 1fr; gap: 10px; padding: 11px; }
+  .signal-sticker > span { width: 46px; height: 46px; }
+  .signal-sticker strong { font-size: 12px; }
+  .signal-sticker small { margin-top: 5px; font-size: 9px; }
   .control-match .action-area { margin-top: 15px; }
 }
 
