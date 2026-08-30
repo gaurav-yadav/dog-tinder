@@ -99,7 +99,6 @@ export default function Home() {
   const cancelledRef = useRef(false);
   const recordingIntervalRef = useRef(null);
   const recordingTimeoutRef = useRef(null);
-  const resultTimeoutRef = useRef(null);
   const analysisAbortRef = useRef(null);
 
   const clearRecordingTimers = useCallback(() => {
@@ -116,8 +115,6 @@ export default function Home() {
   }, []);
 
   const advanceCandidate = useCallback(() => {
-    if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
-    resultTimeoutRef.current = null;
     const previousId = currentDogRef.current.id;
     const next = takeNextDog(queueRef.current, dogs, previousId);
     queueRef.current = next.queue;
@@ -154,7 +151,6 @@ export default function Home() {
 
   useEffect(() => () => {
     clearRecordingTimers();
-    if (resultTimeoutRef.current) clearTimeout(resultTimeoutRef.current);
     analysisAbortRef.current?.abort();
     if (recorderRef.current?.state !== 'inactive') recorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -245,8 +241,7 @@ export default function Home() {
     setAnalysis(payload);
     await delay(800);
     setPhase(payload.result);
-    resultTimeoutRef.current = setTimeout(advanceCandidate, 2700);
-  }, [advanceCandidate, fixtureId, forceFallback]);
+  }, [fixtureId, forceFallback]);
 
   const stopRecording = useCallback((cancel = false) => {
     cancelledRef.current = cancel;
@@ -540,7 +535,7 @@ export default function Home() {
             )}
             {(phase === 'MATCH' || phase === 'PASS') && (
               <button className="start-button incoming-button" type="button" onClick={advanceCandidate}>
-                <Sparkles size={20} /> Next dog now
+                <Sparkles size={20} /> Next dog
               </button>
             )}
             <p className="privacy-note"><ShieldCheck size={11} /> Camera stays on only for one short reaction clip.</p>
