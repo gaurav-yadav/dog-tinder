@@ -206,6 +206,11 @@ button { cursor: pointer; }
 .cancel-button { padding: 0 18px; color: var(--cream); background: transparent; border: 1px solid rgba(255,255,255,.16); }
 .analyzing-button, .incoming-button { display: flex; justify-content: center; text-align: center; background: rgba(255,255,255,.08); box-shadow: none; color: rgba(255,246,232,.7); }
 .incoming-button { background: rgba(83,224,164,.13); color: var(--mint); }
+.match-actions { display: grid; gap: 10px; }
+.puppy-button { color: var(--ink); background: linear-gradient(135deg, var(--yellow), #ffb85a); box-shadow: 0 15px 45px rgba(255,216,90,.2); }
+.puppy-button .button-icon { background: rgba(255,255,255,.28); }
+.next-dog-secondary { min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; color: rgba(255,246,232,.58); background: transparent; border: 1px solid rgba(255,255,255,.13); font-size: 11px; font-weight: 800; }
+.next-dog-secondary:hover { color: var(--cream); background: rgba(255,255,255,.06); }
 .retry-button { display: flex; justify-content: center; color: var(--ink); background: var(--yellow); box-shadow: 0 15px 45px rgba(255,216,90,.14); }
 .capture-warning { display: grid; grid-template-columns: auto 1fr; gap: 12px; margin-top: 22px; padding: 17px; border: 1px solid rgba(255,216,90,.22); border-radius: 16px; color: var(--yellow); background: rgba(255,216,90,.08); }
 .capture-warning strong { color: var(--cream); font-size: 12px; }
@@ -214,6 +219,28 @@ button { cursor: pointer; }
 .privacy-note { display: flex; justify-content: center; align-items: center; gap: 5px; }
 .error-message { display: grid; grid-template-columns: auto 1fr; gap: 9px; margin-top: 20px; padding: 14px; color: #ffd6df; background: rgba(255,79,115,.12); border: 1px solid rgba(255,79,115,.22); border-radius: 14px; font-size: 11px; line-height: 1.45; }
 .error-message button { grid-column: 2; justify-self: start; padding: 0; color: var(--yellow); background: transparent; border: 0; text-decoration: underline; font-size: 10px; font-weight: 800; }
+
+.puppy-dialog { width: min(560px, calc(100vw - 32px)); max-height: 92svh; overflow-y: auto; padding: clamp(24px, 4vw, 38px); color: var(--cream); background: radial-gradient(circle at 50% 22%, rgba(255,216,90,.16), transparent 38%), #21142d; border: 1px solid rgba(255,255,255,.17); border-radius: 28px; box-shadow: 0 38px 100px rgba(0,0,0,.72); animation: puppyDialogIn .38s cubic-bezier(.16,1,.3,1) both; }
+.puppy-dialog::backdrop { background: rgba(11,6,17,.78); backdrop-filter: blur(9px); }
+.puppy-dialog-close { position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; display: grid; place-items: center; color: rgba(255,246,232,.68); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 50%; }
+.puppy-dialog-close svg { width: 18px; }
+.puppy-dialog-kicker { display: flex; justify-content: center; align-items: center; gap: 8px; color: var(--yellow); font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .18em; }
+.puppy-dialog h2 { margin: 12px 45px 22px; outline: 0; text-align: center; font-size: clamp(35px, 6vw, 52px); line-height: .94; letter-spacing: -.055em; }
+.puppy-portrait { position: relative; overflow: hidden; width: min(100%, 430px); aspect-ratio: 1; margin: 0 auto; display: grid; place-items: center; border-radius: 24px; color: var(--cream); background: radial-gradient(circle, rgba(255,79,115,.2), transparent 46%), #140c1e; border: 1px solid rgba(255,255,255,.14); }
+.puppy-portrait img { width: 100%; height: 100%; object-fit: cover; animation: puppyReveal .65s cubic-bezier(.16,1,.3,1) both; }
+.puppy-loading-state, .puppy-error-state { max-width: 290px; display: grid; justify-items: center; gap: 10px; padding: 28px; text-align: center; }
+.puppy-loading-state strong, .puppy-error-state strong { font-size: 17px; }
+.puppy-loading-state span, .puppy-error-state span { color: rgba(255,246,232,.52); font-size: 11px; line-height: 1.5; }
+.puppy-error-state > svg { color: var(--yellow); }
+.puppy-countdown { position: relative; width: 100px; height: 100px; display: grid; place-items: center; color: var(--yellow); border: 1px dashed rgba(255,216,90,.58); border-radius: 50%; animation: puppyOrbit 8s linear infinite; }
+.puppy-countdown b { font-family: var(--font-geist-mono); font-size: 46px; letter-spacing: -.08em; animation: counterRotate 8s linear infinite; }
+.puppy-countdown > svg:last-child { position: absolute; right: -7px; top: 8px; width: 22px; color: var(--coral); animation: counterRotate 8s linear infinite; }
+.puppy-countdown .spin { width: 36px; animation: spin 1.2s linear infinite; }
+.puppy-disclaimer { max-width: 390px; margin: 17px auto 0; color: rgba(255,246,232,.45); text-align: center; font-size: 10px; line-height: 1.5; }
+.puppy-dialog-actions { margin-top: 20px; display: flex; justify-content: center; gap: 9px; }
+.puppy-dialog-actions button { min-height: 46px; padding: 0 21px; border-radius: 14px; font-size: 11px; font-weight: 850; }
+.puppy-retry { display: flex; align-items: center; gap: 8px; color: var(--ink); background: var(--yellow); border: 0; }
+.puppy-done { color: var(--cream); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.13); }
 
 @keyframes subtleZoom { from { transform: scale(1); } to { transform: scale(1.045); } }
 @keyframes scan { 0% { top: 2%; opacity: .2; } 50% { top: 96%; opacity: 1; } 100% { top: 2%; opacity: .2; } }
@@ -224,6 +251,10 @@ button { cursor: pointer; }
 @keyframes comparisonIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
 @keyframes verdictPulse { 50% { transform: scale(1.08) rotate(-4deg); box-shadow: 0 0 0 17px rgba(255,79,115,.08), 0 0 75px rgba(255,79,115,.6); } }
 @keyframes sparkFloat { 0%, 100% { transform: translateY(0) rotate(-8deg); opacity: .35; } 50% { transform: translateY(-18px) rotate(9deg); opacity: 1; } }
+@keyframes puppyDialogIn { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes puppyReveal { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: scale(1); } }
+@keyframes puppyOrbit { to { transform: rotate(360deg); } }
+@keyframes counterRotate { to { transform: rotate(-360deg); } }
 
 @media (max-height: 820px) and (min-width: 901px) {
   .demo-grid { margin-top: 24px; min-height: calc(100svh - 106px); }
@@ -256,4 +287,7 @@ button { cursor: pointer; }
   .comparison-copy { margin-top: 12px; }
   .panel-heading h2 { font-size: 45px; }
   .active-state h2 { font-size: 43px; }
+  .puppy-dialog { width: 100%; max-width: none; max-height: 92svh; margin: auto 0 0; padding: 24px 17px calc(20px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; }
+  .puppy-dialog h2 { margin-bottom: 17px; }
+  .puppy-portrait { border-radius: 20px; }
 }

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { CandidateMedia } from '@/components/CandidateMedia';
 import { DemoControls } from '@/components/DemoControls';
+import { PuppyDialog } from '@/components/PuppyDialog';
 import { ReactionCamera } from '@/components/ReactionCamera';
 import { ReactionComparison } from '@/components/ReactionComparison';
 import { SignalBars } from '@/components/SignalBars';
@@ -26,6 +27,7 @@ import {
 } from '@/lib/analysisConfig';
 import { shuffleDogs, takeNextDog } from '@/lib/candidateQueue';
 import { scoreReaction } from '@/lib/scoring';
+import { capturePlayingVideoFrame, captureVideoSourceFrame } from '@/lib/videoFrames';
 
 const analysisMessages = [
   'Reading tail telemetry…',
@@ -36,6 +38,9 @@ const analysisMessages = [
 
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 const debugSaveRecordings = process.env.NEXT_PUBLIC_DEBUG_SAVE_RECORDINGS === 'true';
+const LIVE_REACTION_SECONDS = 10;
+const MIN_ANALYSIS_REVEAL_MS = 5_000;
+const SIGNAL_REVEAL_MS = 800;
 
 function saveDebugRecording(recordingBlob) {
   if (!debugSaveRecordings || !recordingBlob?.size) return null;
@@ -85,13 +90,15 @@ export default function Home() {
   const [forceFallback, setForceFallback] = useState(false);
   const [demoEnabled, setDemoEnabled] = useState(process.env.NEXT_PUBLIC_DEMO_MODE === 'true');
   const [demoOpen, setDemoOpen] = useState(false);
-  const [countdown, setCountdown] = useState(12);
+  const [countdown, setCountdown] = useState(LIVE_REACTION_SECONDS);
   const [analysisMessage, setAnalysisMessage] = useState(0);
   const [analysis, setAnalysis] = useState(null);
   const [lastAnalysis, setLastAnalysis] = useState(null);
   const [reactionPreviewUrl, setReactionPreviewUrl] = useState('');
   const [stream, setStream] = useState(null);
   const [error, setError] = useState('');
+  const [puppy, setPuppy] = useState({ status: 'idle', imageUrl: '', error: '', elapsedMs: null });
+  const [puppyOpen, setPuppyOpen] = useState(false);
 
   const queueRef = useRef([]);
   const currentDogRef = useRef(dogs[0]);
@@ -105,6 +112,10 @@ export default function Home() {
   const recordingTimeoutRef = useRef(null);
   const analysisAbortRef = useRef(null);
   const reactionPreviewUrlRef = useRef('');
+  const puppyImageUrlRef = useRef('');
+  const puppyAbortRef = useRef(null);
+  const puppyJobRef = useRef(0);
+  const puppyFramesRef = useRef(null);
 
   const clearRecordingTimers = useCallback(() => {
     if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
@@ -133,8 +144,108 @@ export default function Home() {
     setReactionPreviewUrl(previewUrl);
   }, []);
 
+  const clearPuppy = useCallback(() => {
+    puppyJobRef.current += 1;
+    puppyAbortRef.current?.abort();
+    puppyAbortRef.current = null;
+    puppyFramesRef.current = null;
+    if (puppyImageUrlRef.current) URL.revokeObjectURL(puppyImageUrlRef.current);
+    puppyImageUrlRef.current = '';
+    setPuppy({ status: 'idle', imageUrl: '', error: '', elapsedMs: null });
+    setPuppyOpen(false);
+  }, []);
+
+  const requestPuppyImage = useCallback(async (frames, jobId) => {
+    const abortController = new AbortController();
+    puppyAbortRef.current?.abort();
+    puppyAbortRef.current = abortController;
+    const startedAt = performance.now();
+    setPuppy({ status: 'generating', imageUrl: '', error: '', elapsedMs: null });
+
+    try {
+      const formData = new FormData();
+      formData.append('candidateFrame', frames.candidateFrame, 'candidate.jpg');
+      formData.append('reactionFrame', frames.reactionFrame, 'reaction.jpg');
+      const response = await fetch('/api/generate-puppy', {
+        method: 'POST',
+        body: formData,
+        signal: abortController.signal,
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.error || 'Puppy generation failed.');
+      }
+      const imageBlob = await response.blob();
+      if (!imageBlob.size || !imageBlob.type.startsWith('image/')) {
+        throw new Error('The puppy generator returned an invalid image.');
+      }
+      if (puppyJobRef.current !== jobId) return;
+      if (puppyImageUrlRef.current) URL.revokeObjectURL(puppyImageUrlRef.current);
+      const imageUrl = URL.createObjectURL(imageBlob);
+      puppyImageUrlRef.current = imageUrl;
+      puppyAbortRef.current = null;
+      setPuppy({
+        status: 'ready',
+        imageUrl,
+        error: '',
+        elapsedMs: Math.round(performance.now() - startedAt),
+      });
+    } catch (generationError) {
+      if (generationError instanceof DOMException && generationError.name === 'AbortError') return;
+      if (puppyJobRef.current !== jobId) return;
+      puppyAbortRef.current = null;
+      setPuppy({
+        status: 'error',
+        imageUrl: '',
+        error: generationError instanceof Error ? generationError.message : 'Puppy generation failed.',
+        elapsedMs: Math.round(performance.now() - startedAt),
+      });
+    }
+  }, []);
+
+  const startPuppyGeneration = useCallback(async (reactionBlob) => {
+    const jobId = puppyJobRef.current + 1;
+    puppyJobRef.current = jobId;
+    setPuppy({ status: 'generating', imageUrl: '', error: '', elapsedMs: null });
+
+    try {
+      const currentDogId = currentDogRef.current.id;
+      const fallbackDog = dogs.find((dog) => dog.id !== currentDogId) || dogs[0];
+      const [candidateFrame, reactionFrame] = await Promise.all([
+        capturePlayingVideoFrame(candidateVideoRef.current),
+        reactionBlob?.size
+          ? captureVideoSourceFrame(reactionBlob)
+          : captureVideoSourceFrame(fallbackDog.videoUrl),
+      ]);
+      if (puppyJobRef.current !== jobId) return;
+      const frames = { candidateFrame, reactionFrame };
+      puppyFramesRef.current = frames;
+      await requestPuppyImage(frames, jobId);
+    } catch (captureError) {
+      if (puppyJobRef.current !== jobId) return;
+      setPuppy({
+        status: 'error',
+        imageUrl: '',
+        error: captureError instanceof Error ? captureError.message : 'Dog snapshots could not be captured.',
+        elapsedMs: null,
+      });
+    }
+  }, [requestPuppyImage]);
+
+  const retryPuppyGeneration = useCallback(() => {
+    const frames = puppyFramesRef.current;
+    if (!frames) {
+      setPuppy({ status: 'error', imageUrl: '', error: 'Both dog clips are needed.', elapsedMs: null });
+      return;
+    }
+    const jobId = puppyJobRef.current + 1;
+    puppyJobRef.current = jobId;
+    void requestPuppyImage(frames, jobId);
+  }, [requestPuppyImage]);
+
   const advanceCandidate = useCallback(() => {
     clearReactionPreview();
+    clearPuppy();
     const previousId = currentDogRef.current.id;
     const next = takeNextDog(queueRef.current, dogs, previousId);
     queueRef.current = next.queue;
@@ -145,7 +256,7 @@ export default function Home() {
     setError('');
     setPhase('BROWSING');
     setTimeout(() => mainActionRef.current?.focus(), 50);
-  }, [clearReactionPreview]);
+  }, [clearPuppy, clearReactionPreview]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -172,9 +283,11 @@ export default function Home() {
   useEffect(() => () => {
     clearRecordingTimers();
     analysisAbortRef.current?.abort();
+    puppyAbortRef.current?.abort();
     if (recorderRef.current?.state !== 'inactive') recorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
     if (reactionPreviewUrlRef.current) URL.revokeObjectURL(reactionPreviewUrlRef.current);
+    if (puppyImageUrlRef.current) URL.revokeObjectURL(puppyImageUrlRef.current);
   }, [clearRecordingTimers]);
 
   const analyzeReaction = useCallback(async (recordedBlob = null, recordingDownload = null) => {
@@ -185,6 +298,7 @@ export default function Home() {
 
     const startedAt = Date.now();
     let payload;
+    let puppyReactionBlob = recordedBlob;
 
     try {
       const formData = new FormData();
@@ -206,10 +320,15 @@ export default function Home() {
       }
 
       if (uploadBlob) {
+        puppyReactionBlob = uploadBlob;
         showReactionPreview(uploadBlob);
         const extension = uploadBlob.type.includes('mp4') ? 'mp4' : 'webm';
         formData.append('video', uploadBlob, `reaction.${extension}`);
       }
+
+      // Start the visual payoff as soon as both clips exist. OpenRouter then runs
+      // in parallel with TwelveLabs, hiding most of its ~30s latency behind analysis.
+      void startPuppyGeneration(puppyReactionBlob);
 
       const abortController = new AbortController();
       analysisAbortRef.current = abortController;
@@ -262,13 +381,18 @@ export default function Home() {
       },
     };
 
-    const remainingDemoTime = Math.max(0, 2600 - (Date.now() - startedAt));
+    if (payload.result !== 'MATCH') clearPuppy();
+
+    const remainingDemoTime = Math.max(
+      0,
+      MIN_ANALYSIS_REVEAL_MS - SIGNAL_REVEAL_MS - (Date.now() - startedAt),
+    );
     await delay(remainingDemoTime);
     setLastAnalysis(payload);
     setAnalysis(payload);
-    await delay(800);
+    await delay(SIGNAL_REVEAL_MS);
     setPhase(payload.result);
-  }, [fixtureId, forceFallback, inputMode, showReactionPreview]);
+  }, [clearPuppy, fixtureId, forceFallback, inputMode, showReactionPreview, startPuppyGeneration]);
 
   const stopRecording = useCallback((cancel = false) => {
     cancelledRef.current = cancel;
@@ -311,7 +435,7 @@ export default function Home() {
       let recordingStartedAt = 0;
       const recorder = new MediaRecorder(cameraStream, {
         ...(mimeType ? { mimeType } : {}),
-        // Keep a 12-second Chrome clip under the local/API upload ceiling.
+        // Keep a 10-second Chrome clip under the local/API upload ceiling.
         videoBitsPerSecond: 450_000,
         // Give downstream analyzers seekable frames throughout the clip instead
         // of a single opening keyframe that only shows phone-positioning setup.
@@ -364,7 +488,7 @@ export default function Home() {
         setPhase('BROWSING');
       };
 
-      setCountdown(12);
+      setCountdown(LIVE_REACTION_SECONDS);
       setPhase('RECORDING');
       recordingStartedAt = performance.now();
       // Let Chrome emit one complete, finalized file when stop() is called.
@@ -372,13 +496,16 @@ export default function Home() {
       recorder.start();
 
       recordingIntervalRef.current = setInterval(() => {
-        const secondsLeft = Math.max(0, 12 - Math.floor((performance.now() - recordingStartedAt) / 1000));
+        const secondsLeft = Math.max(
+          0,
+          LIVE_REACTION_SECONDS - Math.floor((performance.now() - recordingStartedAt) / 1000),
+        );
         setCountdown(secondsLeft);
       }, 250);
 
       recordingTimeoutRef.current = setTimeout(() => {
         if (recorder.state !== 'inactive') recorder.stop();
-      }, 12_000);
+      }, LIVE_REACTION_SECONDS * 1_000);
     } catch {
       releaseCamera();
       setInputMode('fixture');
@@ -412,11 +539,12 @@ export default function Home() {
 
   const retryReaction = useCallback(() => {
     clearReactionPreview();
+    clearPuppy();
     setAnalysis(null);
     setError('');
     setPhase('BROWSING');
     setTimeout(() => mainActionRef.current?.focus(), 50);
-  }, [clearReactionPreview]);
+  }, [clearPuppy, clearReactionPreview]);
 
   const finishEarly = useCallback(() => {
     if (inputMode === 'webcam') stopRecording(false);
@@ -473,6 +601,13 @@ export default function Home() {
         onForceFallback={setForceFallback}
       />
 
+      <PuppyDialog
+        open={puppyOpen}
+        puppy={puppy}
+        onClose={() => setPuppyOpen(false)}
+        onRetry={retryPuppyGeneration}
+      />
+
       <section className="demo-grid" id="main-stage">
         <article
           className={`candidate-card phase-${phase.toLowerCase()} ${result ? `result-${result.toLowerCase()}` : ''}`}
@@ -521,7 +656,7 @@ export default function Home() {
               <div className="countdown-number">{countdown}<small>sec</small></div>
               <h2>Eyes on {currentDog.name}.</h2>
               <p>Keep the reacting dog—or the phone playing it—large and centered. Watching for wags, wiggles, approaches, and walk-aways.</p>
-              <div className="record-progress"><span style={{ width: `${((inputMode === 'webcam' ? 12 - countdown : 3 - countdown) / (inputMode === 'webcam' ? 12 : 3)) * 100}%` }} /></div>
+              <div className="record-progress"><span style={{ width: `${((inputMode === 'webcam' ? LIVE_REACTION_SECONDS - countdown : 3 - countdown) / (inputMode === 'webcam' ? LIVE_REACTION_SECONDS : 3)) * 100}%` }} /></div>
             </div>
           )}
 
@@ -590,7 +725,7 @@ export default function Home() {
                 <span className="button-icon"><PawPrint size={23} /></span>
                 <span>
                   <b>Start reaction</b>
-                  <small>{inputMode === 'webcam' ? '12 second camera check' : `${reactionFixtures[fixtureId].label} · quick demo`}</small>
+                  <small>{inputMode === 'webcam' ? '10 second camera check' : `${reactionFixtures[fixtureId].label} · quick demo`}</small>
                 </span>
                 <Heart className="button-heart" size={21} fill="currentColor" />
               </button>
@@ -606,7 +741,28 @@ export default function Home() {
                 <LoaderCircle className="spin" size={22} /> AI is watching the reaction
               </button>
             )}
-            {(phase === 'MATCH' || phase === 'PASS') && (
+            {phase === 'MATCH' && (
+              <div className="match-actions">
+                <button className="start-button puppy-button" type="button" onClick={() => setPuppyOpen(true)}>
+                  <span className="button-icon"><PawPrint size={23} /></span>
+                  <span>
+                    <b>{puppy.status === 'ready' ? 'Meet your puppy' : puppy.status === 'error' ? 'Retry puppy preview' : 'See the puppies'}</b>
+                    <small>
+                      {puppy.status === 'ready'
+                        ? `Ready${puppy.elapsedMs ? ` in ${(puppy.elapsedMs / 1000).toFixed(1)}s` : ''}`
+                        : puppy.status === 'error'
+                          ? 'Generation needs another try'
+                          : 'Already dreaming in the background'}
+                    </small>
+                  </span>
+                  {puppy.status === 'generating' ? <LoaderCircle className="spin" size={21} /> : <Heart size={21} fill="currentColor" />}
+                </button>
+                <button className="next-dog-secondary" type="button" onClick={advanceCandidate}>
+                  <Sparkles size={17} /> Next dog
+                </button>
+              </div>
+            )}
+            {phase === 'PASS' && (
               <button className="start-button incoming-button" type="button" onClick={advanceCandidate}>
                 <Sparkles size={20} /> Next dog
               </button>
