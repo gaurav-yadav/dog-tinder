@@ -305,6 +305,9 @@ export default function Home() {
         ...(mimeType ? { mimeType } : {}),
         // Keep a 12-second Chrome clip under the local/API upload ceiling.
         videoBitsPerSecond: 450_000,
+        // Give downstream analyzers seekable frames throughout the clip instead
+        // of a single opening keyframe that only shows phone-positioning setup.
+        videoKeyFrameIntervalDuration: 1_000,
       });
       recorderRef.current = recorder;
 
@@ -500,7 +503,7 @@ export default function Home() {
               <div className="eyebrow recording-eyebrow"><span className="pulse-dot" /> Reaction recording</div>
               <div className="countdown-number">{countdown}<small>sec</small></div>
               <h2>Eyes on {currentDog.name}.</h2>
-              <p>Watching for wags, wiggles, approaches, and walk-aways.</p>
+              <p>Keep the reacting dog—or the phone playing it—large and centered. Watching for wags, wiggles, approaches, and walk-aways.</p>
               <div className="record-progress"><span style={{ width: `${((inputMode === 'webcam' ? 12 - countdown : 3 - countdown) / (inputMode === 'webcam' ? 12 : 3)) * 100}%` }} /></div>
             </div>
           )}
